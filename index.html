@@ -171,4 +171,103 @@
 
     <div class="sub">Tap “Yes” 😄</div>
 
-    <div class="butto
+    <div class="buttons" id="arena">
+      <button id="yesBtn">Yes! 💖</button>
+      <button id="noBtn">No</button>
+    </div>
+  </div>
+
+  <div class="overlay" id="overlay"></div>
+
+  <div class="celebration" id="celebration">
+    <h2>Yaaay! 🎉💕</h2>
+    <p>I knew it! 😄</p>
+    <p style="margin-top:10px;">I can’t wait to see you ❤️</p>
+    <button class="closeBtn" id="closeBtn">Close</button>
+  </div>
+
+  <script>
+    const noBtn = document.getElementById("noBtn");
+    const yesBtn = document.getElementById("yesBtn");
+    const arena = document.getElementById("arena");
+    const overlay = document.getElementById("overlay");
+    const celebration = document.getElementById("celebration");
+    const closeBtn = document.getElementById("closeBtn");
+
+    let dodges = 0;
+
+    function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
+
+    function moveNoButton() {
+      const a = arena.getBoundingClientRect();
+      const b = noBtn.getBoundingClientRect();
+
+      const maxX = a.width - b.width;
+      const maxY = a.height - b.height;
+
+      let x = Math.random() * maxX;
+      let y = Math.random() * maxY;
+
+      const yesRect = yesBtn.getBoundingClientRect();
+      const yesLocalX = yesRect.left - a.left;
+      const yesLocalY = yesRect.top - a.top;
+
+      const distX = Math.abs(x - yesLocalX);
+      const distY = Math.abs(y - yesLocalY);
+
+      if (distX < 120 && distY < 80) {
+        y = clamp(y + 60, 0, maxY);
+      }
+
+      noBtn.style.left = x + "px";
+      noBtn.style.top  = y + "px";
+
+      dodges++;
+      const scale = 1 + Math.min(dodges * 0.06, 0.6);
+      yesBtn.style.transform = `translateX(-50%) scale(${scale})`;
+    }
+
+    function celebrate() {
+      overlay.style.display = "block";
+      celebration.style.display = "block";
+      createConfetti();
+    }
+
+    function closeCelebration(){
+      overlay.style.display = "none";
+      celebration.style.display = "none";
+    }
+
+    function createConfetti() {
+      const colors = ["#e74c3c","#e91e63","#9c27b0","#f44336","#ff9800"];
+      for (let i = 0; i < 90; i++) {
+        setTimeout(() => {
+          const c = document.createElement("div");
+          c.style.position = "fixed";
+          c.style.width = "10px";
+          c.style.height = "10px";
+          c.style.background = colors[Math.floor(Math.random()*colors.length)];
+          c.style.left = Math.random() * window.innerWidth + "px";
+          c.style.top = "-12px";
+          c.style.borderRadius = "50%";
+          c.style.zIndex = "2000";
+          c.style.animation = `fall ${2.2 + Math.random()*1.8}s linear forwards`;
+          document.body.appendChild(c);
+          setTimeout(() => c.remove(), 4500);
+        }, i * 20);
+      }
+    }
+
+    noBtn.addEventListener("pointerdown", e => {
+      e.preventDefault();
+      moveNoButton();
+    });
+
+    noBtn.addEventListener("mouseenter", moveNoButton);
+    yesBtn.addEventListener("click", celebrate);
+    closeBtn.addEventListener("click", closeCelebration);
+    overlay.addEventListener("click", closeCelebration);
+  </script>
+
+</body>
+</html>
